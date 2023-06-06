@@ -8,6 +8,8 @@ This repository contains an implementation of the reinforcement learning method 
 
 ## Method
 
+[RNN Encoder Decoder](https://github.com/threelittlemonkeys/rnn-encoder-decoder-pytorch)
+
 ## Requirements
 
 ## Experiment
