@@ -1,46 +1,55 @@
-class Encoder(nn.Module):
-    def __init__(self, input_dim, emb_dim, enc_hid_dim, dec_hid_dim, dropout):
-        super().__init__()
-        
-        self.embedding = nn.Embedding(input_dim, emb_dim)
-        self.rnn = nn.GRU(emb_dim, enc_hid_dim, num_layers=3, bidirectional = True)
-        self.fc = nn.Linear(enc_hid_dim * 2, dec_hid_dim)
-        self.dropout = nn.Dropout(dropout)
-        
-    def forward(self, src):
-        #src = [src len, batch size]
-        
-        embedded = self.dropout(self.embedding(src))
-        #embedded = [src len, batch size, emb dim]
-        
-        outputs, hidden = self.rnn(embedded)
-        #outputs = [src len, batch size, hid dim * num directions]
-        #hidden = [n layers * num directions, batch size, hid dim]
-        
-        #hidden is stacked [forward_1, backward_1, forward_2, backward_2, ...]
-        #outputs are always from the last layer
-        
-        #hidden [-2, :, : ] is the last of the forwards RNN 
-        #hidden [-1, :, : ] is the last of the backwards RNN
-        
-        #initial decoder hidden is final hidden state of the forwards and backwards 
-        #  encoder RNNs fed through a linear layer
-        hidden = torch.tanh(self.fc(torch.cat((hidden[-2,:,:], hidden[-1,:,:]), dim = 1)))
-        
-        #outputs = [src len, batch size, enc hid dim * 2]
-        #hidden = [batch size, dec hid dim]
-        
-        return outputs, hidden
-    
-    # Define hyperparameters
-input_vocab_size = len(vocab)
-target_vocab_size = 8000
-embedding_dim = 256
-hidden_size = 512
+import torch
+from torch.nn.functional import softmax
+from torch.distributions import Categorical
 
-# Create encoder and decoder instances
-encoder = Encoder(input_vocab_size, embedding_dim, hidden_size)
-decoder = Decoder(target_vocab_size, embedding_dim, hidden_size)
+def DUP(z, voc):
+    out = torch.zeros_like(voc)
+    out[voc == z[-1]] = -1
+    return out
 
-# Create the Seq2Seq model
-model = Seq2Seq(encoder, decoder)
+def EOS(voc, t, target_sentence, end_token):
+    out = torch.zeros_like(voc)
+    if t < len(target_sentence):
+        # voc == end_token 也許再改
+        out[voc == end_token] = -1
+    return out
+
+class Updater:
+    def __init__(self, model, optimizer, R: function, vocabulary, p_drop=0.5, W=10000, J=1) -> None:
+        self.p_drop = p_drop
+        self.W = W
+        self.J = J
+        self.optimizer = optimizer
+        self.R = R
+        self.model = model
+        self.voc = vocabulary
+
+    def updata(self, x, y):
+        L_BBSPG = 0
+        for j in range(1, self.J+1):
+            z = []
+            for t in range(1, self.T+1):
+                mu = torch.rand((1, ))
+
+                model_output = self.model() # what should be input to model? x? 
+                if mu > self.p_drop:
+                    # 參數傳入也許再改
+                    # eos 應該可以從voc得到 所以應該寫在EOS裡而不虛傳入
+                    delta_r = self.W * (self.R(z, self.voc, t, y) - self.R(z, self.voc, t-1, y) + DUP(z, self.voc) + EOS(self.voc, t, y, eos))
+
+                    prob = softmax(torch.log(model_output) + delta_r)
+                    zt_idx = Categorical(probs=prob).sample()
+                    z_t = self.voc[zt_idx]
+
+                    L_BBSPG -= torch.log(model_output[zt_idx])
+                
+                else:
+                    prob = model_output
+                    z_t = self.voc[Categorical(probs=prob).sample()]
+
+                z.append(z_t)
+
+        L_BBSPG /= self.J
+        L_BBSPG.backward()
+        
+        return
