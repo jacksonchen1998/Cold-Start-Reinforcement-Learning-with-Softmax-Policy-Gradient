@@ -15,17 +15,18 @@ def EOS(voc, t, target_sentence, end_token):
     return out
 
 class Updater:
-    def __init__(self, model, optimizer, R: function, vocabulary, p_drop=0.5, W=10000, J=1) -> None:
+    def __init__(self, model, R: function, vocabulary, p_drop=0.5, W=10000, J=1) -> None:
         self.p_drop = p_drop
         self.W = W
         self.J = J
-        self.optimizer = optimizer
         self.R = R
         self.model = model
         self.voc = vocabulary
 
     def updata(self, x, y):
         L_BBSPG = 0
+        loss = 0 
+        rewards = []
         for j in range(1, self.J+1):
             z = []
             for t in range(1, self.T+1):
@@ -42,6 +43,9 @@ class Updater:
                     z_t = self.voc[zt_idx]
 
                     L_BBSPG -= torch.log(model_output[zt_idx])
+                    L_BBSPG /= self.J
+                    loss += L_BBSPG.item()
+                    L_BBSPG.backward()
                 
                 else:
                     prob = model_output
@@ -49,7 +53,7 @@ class Updater:
 
                 z.append(z_t)
 
-        L_BBSPG /= self.J
-        L_BBSPG.backward()
+            rewards.append(self.R(z, self.voc, len(z), y))
+
+        return torch.mean(rewards), loss
         
-        return
