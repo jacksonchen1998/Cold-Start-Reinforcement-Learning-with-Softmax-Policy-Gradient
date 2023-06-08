@@ -1,4 +1,5 @@
 from pipeline import Updater
+from model import Attention, Decoder, Encoder, Seq2Seq
 
 def inference():
     '''

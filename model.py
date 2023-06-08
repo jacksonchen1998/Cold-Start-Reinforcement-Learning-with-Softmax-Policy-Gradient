@@ -178,7 +178,10 @@ class Seq2Seq(nn.Module):
                 
         #first input to the decoder is the <sos> tokens
         input = trg[0,:]
+
+        output, hidden = self.decoder(input, hidden, encoder_outputs)
         
+        '''
         for t in range(1, trg_len):
             
             #insert input token embedding, previous hidden state and all encoder hidden states
@@ -189,7 +192,7 @@ class Seq2Seq(nn.Module):
             outputs[t] = output
             
             #decide if we are going to use teacher forcing or not
-            teacher_force = random.random() < teacher_forcing_ratio
+            #teacher_force = random.random() < teacher_forcing_ratio
             
             #get the highest predicted token from our predictions
             top1 = output.argmax(1) 
@@ -199,3 +202,5 @@ class Seq2Seq(nn.Module):
             input = trg[t] if teacher_force else top1
 
         return outputs
+        '''
+        return output
