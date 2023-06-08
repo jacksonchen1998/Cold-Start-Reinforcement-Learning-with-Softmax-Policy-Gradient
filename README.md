@@ -34,8 +34,19 @@ This repository contains an implementation of the reinforcement learning method 
 
 We would like to thank Nan Ding and Radu Soricut for their valuable contributions to the field of reinforcement learning, and for making their paper available to the public. We also acknowledge the TensorFlow team for providing a powerful and flexible deep learning framework.
 
-## Reference
+## Citation
 
+```
+@misc{cccpylpcc2023,
+  author = {Chih-Chun Chen, Pin-Yen Liu, Po-Chuan Chen},
+  title = {Cold-Start Reinforcement Learning with Softmax Policy Gradient},
+  year = {2023},
+  month = {June 15},
+  note = {Version 1.0},
+  howpublished = {GitHub},
+  url = {https://github.com/jacksonchen1998/Cold-Start-Reinforcement-Learning-with-Softmax-Policy-Gradient}
+}
+```
 
 ```
 @misc{ding2017coldstart,
