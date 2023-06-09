@@ -1,17 +1,24 @@
 from pipeline import Updater
-from dataloader import 
+from dataloader import get_vocab, get_train_dataloader
 from model import Attention, Decoder, Encoder, Seq2Seq
 from tqdm import tqdm, trange
 from torchmetrics import MeanMetric
-from torchmetrics.text.rouge import rouge_score
+from torchmetrics.functional.text.rouge import rouge_score
 import torch
+from datasets import load_dataset
+from torchtext.data.utils import get_tokenizer
 from torch.utils.tensorboard import SummaryWriter
 
-def compute_rouge(x, y):
-    # Convert embbeding to str
-    preds, target = tokenizer(x), tokenizer(y)
+print(rouge_score(["My name is John", "My name is John"], "Is your name John"))
+exit()
 
-    score = rouge_score(preds, target, tokenizer=tokenizer)
+def compute_rouge(z, y, voc, t):
+    # Convert embbeding to str
+    target = tokenizer.decode(y)
+
+    pred = torch.cat([z[None, :], voc])
+
+    score = rouge_score(z, target, tokenizer=tokenizer)
     # score = {'rouge1_fmeasure': tensor(0.7500),
     #  'rouge1_precision': tensor(0.7500),
     #  'rouge1_recall': tensor(0.7500),
@@ -112,16 +119,20 @@ if __name__ == '__main__':
         T_max= epochs,
         eta_min= 1e-5
     )
+    J = 1
+
+    SRC_vocab, TRG_vocab, text_transform= get_vocab()
+
     updater = Updater(
         model,
         optimizer,
         R=compute_rouge,
-        vocabulary=,
+        vocabulary=SRC_vocab,
+        J=J
     )
 
-    train_loader = Dataloader(
-        
+    tokenizer = get_tokenizer('basic_english')
 
-    )
+    train_loader = get_train_dataloader()
 
     train(model, train_loader)
