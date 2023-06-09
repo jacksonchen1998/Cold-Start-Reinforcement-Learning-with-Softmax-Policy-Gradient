@@ -30,7 +30,7 @@ def compute_rouge(z, y, voc, t):
     #  'rougeLsum_fmeasure': tensor(0.5000),
     #  'rougeLsum_precision': tensor(0.5000),
     #  'rougeLsum_recall': tensor(0.5000)}
-    # return score[]
+    return score['rouge1_fmeasure']
 
 def train(model, train_loader):
     '''
@@ -96,15 +96,28 @@ if __name__ == '__main__':
     running_loss = MeanMetric(accumulate=True).to(device)
     running_reward = MeanMetric(accumulate=True).to(device)
 
+    SRC_vocab, TRG_vocab, text_transform= get_vocab()
+
     model = Seq2Seq(
         encoder=Encoder(
             # TODO: paramater of Encoder
+            input_dim=len(SRC_vocab),
+            emb_dim=512,
+            enc_hid_dim=128,
+            dec_hid_dim=128,
+            dropout=0.2
         ),
         decoder=Decoder(
             # TODO: paramater of Decoder
+            output_dim=len(TRG_vocab),
+            emb_dim=512,
+            enc_hid_dim=128,
+            dec_hid_dim=128,
+            dropout=0.2,
+            attention=Attention(128, 128)
         ),
         device=device
-    )
+    ).to(device)
 
     writer = SummaryWriter()
 
@@ -113,18 +126,15 @@ if __name__ == '__main__':
     epochs = 50
     lr = 8e-4
     optimizer = torch.optim.Adam(model.parameters(), lr)
-    scheduler = torch.optim.CosineAnnealingLR(
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
         optimizer,
         T_max= epochs,
         eta_min= 1e-5
     )
     J = 1
 
-    SRC_vocab, TRG_vocab, text_transform= get_vocab()
-
     updater = Updater(
         model,
-        optimizer,
         R=compute_rouge,
         vocabulary=SRC_vocab,
         J=J

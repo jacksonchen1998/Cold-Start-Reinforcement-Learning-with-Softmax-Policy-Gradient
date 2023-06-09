@@ -23,12 +23,12 @@ class Updater:
         self.model = model
         self.voc = vocabulary
 
-    def updata(self, x, y):
+    def update(self, x, y):
         L_BBSPG = 0
         rewards = []
         for j in range(1, self.J+1):
             z = torch.tensor([])
-            for t in range(1, self.T+1):
+            for t in range(1, len(x)+1):
                 mu = torch.rand((1, ))
 
                 # x: (T, B, D) 
