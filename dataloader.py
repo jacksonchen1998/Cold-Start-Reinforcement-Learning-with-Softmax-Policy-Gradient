@@ -7,7 +7,6 @@ from collections import Counter
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence
 
-
 dataset = load_dataset("gigaword")
 train_set = dataset['train']
 val_set = dataset['validation']

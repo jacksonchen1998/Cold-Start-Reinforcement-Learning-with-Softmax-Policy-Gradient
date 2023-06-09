@@ -10,7 +10,7 @@ def DUP(z, voc):
 def EOS(voc, t, target_sentence, end_token):
     out = torch.zeros_like(voc)
     if t < len(target_sentence):
-        # end_token = # TODO: get end_token form voc
+        #  end_token = # TODO: get end_token form voc
         out[voc == end_token] = -1
     return out
 
