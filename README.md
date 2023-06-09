@@ -12,6 +12,12 @@ This repository contains an implementation of the reinforcement learning method 
 
 ## Requirements
 
+Create a conda environment using the following command:
+
+```bash
+conda create -n <env_name> python=3.9
+```
+
 Intsall the required packages using the following command:
 
 ```bash
