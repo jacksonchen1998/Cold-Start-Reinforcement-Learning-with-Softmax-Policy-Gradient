@@ -3,8 +3,28 @@ from dataloader import
 from model import Attention, Decoder, Encoder, Seq2Seq
 from tqdm import tqdm, trange
 from torchmetrics import MeanMetric
+from torchmetrics.text.rouge import rouge_score
 import torch
 from torch.utils.tensorboard import SummaryWriter
+
+def compute_rouge(x, y):
+    # Convert embbeding to str
+    preds, target = tokenizer(x), tokenizer(y)
+
+    score = rouge_score(preds, target, tokenizer=tokenizer)
+    # score = {'rouge1_fmeasure': tensor(0.7500),
+    #  'rouge1_precision': tensor(0.7500),
+    #  'rouge1_recall': tensor(0.7500),
+    #  'rouge2_fmeasure': tensor(0.),
+    #  'rouge2_precision': tensor(0.),
+    #  'rouge2_recall': tensor(0.),
+    #  'rougeL_fmeasure': tensor(0.5000),
+    #  'rougeL_precision': tensor(0.5000),
+    #  'rougeL_recall': tensor(0.5000),
+    #  'rougeLsum_fmeasure': tensor(0.5000),
+    #  'rougeLsum_precision': tensor(0.5000),
+    #  'rougeLsum_recall': tensor(0.5000)}
+    return score[]
 
 def train(model, train_loader):
     '''
@@ -70,7 +90,15 @@ if __name__ == '__main__':
     running_loss = MeanMetric(accumulate=True).to(device)
     running_reward = MeanMetric(accumulate=True).to(device)
 
-    model = pass
+    model = Seq2Seq(
+        encoder=Encoder(
+            # TODO: paramater of Encoder
+        ),
+        decoder=Decoder(
+            # TODO: paramater of Decoder
+        ),
+        device=device
+    )
 
     writer = SummaryWriter()
 
@@ -87,11 +115,12 @@ if __name__ == '__main__':
     updater = Updater(
         model,
         optimizer,
-        R=,
+        R=compute_rouge,
         vocabulary=,
     )
 
     train_loader = Dataloader(
+        
 
     )
 
