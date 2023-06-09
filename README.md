@@ -12,6 +12,12 @@ This repository contains an implementation of the reinforcement learning method 
 
 ## Requirements
 
+Intsall the required packages using the following command:
+
+```bash
+conda install --file requirements.txt
+```
+
 ## Experiment
 
 ### Summarization Task: Headline Generation
