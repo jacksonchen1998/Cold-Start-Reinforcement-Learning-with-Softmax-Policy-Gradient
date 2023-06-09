@@ -1,16 +1,12 @@
 import torch
-import torch.nn as nn
-import torch.optim as optim
-import torch.nn.functional as F
-
-import spacy
-import numpy as np
-
 import random
-import math
-import time
-
 from datasets import load_dataset
+from torchtext.data.utils import get_tokenizer
+from torchtext.vocab import vocab
+from collections import Counter
+from torch.utils.data import DataLoader
+from torch.nn.utils.rnn import pad_sequence
+
 
 dataset = load_dataset("gigaword")
 train_set = dataset['train']
@@ -18,14 +14,6 @@ val_set = dataset['validation']
 test_set = dataset['test']
 
 print(len(train_set), len(val_set), len(test_set))
-
-from transformers import BertTokenizer
-from torchtext.data.utils import get_tokenizer
-from torchtext.vocab import build_vocab_from_iterator
-from torchtext.vocab import vocab
-import numpy as np
-from collections import Counter
-
 
 # tokenizer = BertTokenizer.from_pretrained('bert-base-cased')
 tokenizer = get_tokenizer('basic_english')
@@ -58,9 +46,6 @@ text_transform = lambda x: [vocab['<BOS>']] + [vocab[token] for token in tokeniz
 print("input to the text_transform:", "here is an example")
 print("output of the text_transform:", text_transform("here is an example"))
 
-from torch.utils.data import DataLoader
-from torch.nn.utils.rnn import pad_sequence
-
 train_list = list(train_set)
 
 def collate_batch(batch):
@@ -75,8 +60,6 @@ def collate_batch(batch):
 
 # train_dataloader = DataLoader(train_list, batch_size=8, shuffle=True, 
 #                               collate_fn=collate_batch)
-
-import random
 
 batch_size = 8  # A batch size of 8
 
