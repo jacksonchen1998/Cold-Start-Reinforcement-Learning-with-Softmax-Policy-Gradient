@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import random
 
 class Encoder(nn.Module):
     def __init__(self, input_dim, emb_dim, enc_hid_dim, dec_hid_dim, dropout):
@@ -203,4 +202,6 @@ class Seq2Seq(nn.Module):
 
         return outputs
         '''
-        return output
+        # add softmax
+        outputs = F.softmax(output, dim=2)
+        return outputs
