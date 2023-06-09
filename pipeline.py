@@ -25,35 +25,38 @@ class Updater:
 
     def updata(self, x, y):
         L_BBSPG = 0
-        loss = 0 
         rewards = []
         for j in range(1, self.J+1):
             z = []
             for t in range(1, self.T+1):
                 mu = torch.rand((1, ))
 
-                model_output = self.model() # what should be input to model? x? 
+                # x: (T, B, D) 
+                model_output = self.model(x, y) # what should be input to model? x?
+                # model_output: (B, C), C = voc.size
                 if mu > self.p_drop:
                     # 參數傳入也許再改
                     # eos 應該可以從voc得到 所以應該寫在EOS裡而不虛傳入
                     delta_r = self.W * (self.R(z, self.voc, t, y) - self.R(z, self.voc, t-1, y) + DUP(z, self.voc) + EOS(self.voc, t, y, eos))
 
-                    prob = softmax(torch.log(model_output) + delta_r)
+                    prob = softmax(torch.log(model_output) + delta_r, dim=1)
                     zt_idx = Categorical(probs=prob).sample()
-                    z_t = self.voc[zt_idx]
+                    z_t = self.voc[zt_idx] # (B, 1)
 
-                    L_BBSPG -= torch.log(model_output[zt_idx])
-                    L_BBSPG /= self.J
-                    loss += L_BBSPG.item()
-                    L_BBSPG.backward()
-                
+                    L_BBSPG -= torch.log(model_output[torch.arange(len(zt_idx)), zt_idx]) / self.J # (B,)
+                    
                 else:
                     prob = model_output
+                    # voc.shape = ?
                     z_t = self.voc[Categorical(probs=prob).sample()]
 
                 z.append(z_t)
 
             rewards.append(self.R(z, self.voc, len(z), y))
+
+        L_BBSPG = L_BBSPG.mean()
+        loss = L_BBSPG.item()
+        L_BBSPG.backward()
 
         return torch.mean(rewards), loss
         

@@ -20,13 +20,13 @@ def train(model, train_loader):
         for X, Y in (bar:=tqdm(train_loader, desc=f'[Train {epoch:3d}] lr={scheduler.get_last_lr()[0]:2.2e}', position=0)):
             optimizer.zero_grad()
 
-            for x, y in zip(X, Y):
-                x = x.to(device)
-                y = y.to(device)
-                reward, loss = updater.update(x, y)
+            X = X.to(device)
+            Y = Y.to(device)
 
-                running_reward.update(reward)
-                running_loss.update(loss)
+            reward, loss = updater.update(X, Y)
+
+            running_reward.update(reward)
+            running_loss.update(loss)
             
             optimizer.step()
 
