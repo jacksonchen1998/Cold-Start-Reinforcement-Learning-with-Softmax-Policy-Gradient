@@ -30,7 +30,9 @@ def counter_tokens(dataset, col_name):
 # vocab = build_vocab_from_iterator(yield_tokens(dataset), specials=["<unk>"])
 SRC_vocab = vocab(counter_tokens(train_set, 'document'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
 TRG_vocab = vocab(counter_tokens(train_set, 'summary'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
-text_transform = lambda x: [SRC_vocab['<BOS>']] + [SRC_vocab[token] for token in tokenizer(x)] + [SRC_vocab['<EOS>']]
+# text_transform = lambda x: [SRC_vocab['<BOS>']] + [SRC_vocab[token] for token in tokenizer(x)] + [SRC_vocab['<EOS>']]
+def text_transform(text, vocab):
+    return [vocab['<bos>']] + [vocab[token] for token in tokenizer(text)] + [vocab['<eos>']]
 
 def get_vocab():
     return SRC_vocab, TRG_vocab, text_transform
@@ -54,8 +56,8 @@ def collate_batch(batch):
    target_list, src_list = [], []
    for data in batch:
       _summary, _document = data['summary'], data['document']
-      target_text = torch.tensor(text_transform(_summary))
-      src_text = torch.tensor(text_transform(_document))
+      target_text = torch.tensor(text_transform(_summary, TRG_vocab))
+      src_text = torch.tensor(text_transform(_document, SRC_vocab))
       target_list.append(target_text)
       src_list.append(src_text)
    return pad_sequence(target_list, padding_value=3), pad_sequence(src_list, padding_value=3)
