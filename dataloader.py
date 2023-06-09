@@ -38,8 +38,8 @@ new_stoi = SRC_vocab.get_stoi()
 print("The index of '<PAD>' is", new_stoi['<PAD>'])
 new_itos = SRC_vocab.get_itos()
 print("The token at index 1 is", new_itos[1])
-
-text_transform = lambda x: [vocab['<BOS>']] + [vocab[token] for token in tokenizer(x)] + [vocab['<EOS>']]
+# lambda x: [vocab['<BOS>']] + [vocab[token] for token in tokenizer(x)] + [vocab['<EOS>']]
+text_transform = lambda x: [SRC_vocab['<BOS>']] + [SRC_vocab[token] for token in tokenizer(x)] + [SRC_vocab['<EOS>']]
 # trg_transform = lambda x: 1 if x == 'pos' else 0
 
 # Print out the output of text_transform
