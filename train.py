@@ -5,17 +5,15 @@ from tqdm import tqdm, trange
 from torchmetrics import MeanMetric
 from torchmetrics.functional.text.rouge import rouge_score
 import torch
+import numpy as np
 from datasets import load_dataset
 from torchtext.data.utils import get_tokenizer
 from torch.utils.tensorboard import SummaryWriter
 
-print(rouge_score(["My name is John", "My name is John"], "Is your name John"))
-
-exit()
-
 def compute_rouge(z, y, voc, t):
-    # Convert embbeding to str
-    target = tokenizer.decode(y)
+    # z, y: token_ids (T, B)
+    # Convert y: token_id to str
+    target = np.array(TRG_vocab.get_itos())[y] # [str]
 
     pred = torch.cat([z[None, :], voc])
 
@@ -32,7 +30,7 @@ def compute_rouge(z, y, voc, t):
     #  'rougeLsum_fmeasure': tensor(0.5000),
     #  'rougeLsum_precision': tensor(0.5000),
     #  'rougeLsum_recall': tensor(0.5000)}
-    return score[]
+    # return score[]
 
 def train(model, train_loader):
     '''
