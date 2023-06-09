@@ -32,7 +32,8 @@ def counter_tokens(dataset, col_name):
 SRC_vocab = vocab(counter_tokens(train_set, 'document'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
 TRG_vocab = vocab(counter_tokens(train_set, 'summary'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
 text_transform = lambda x: [SRC_vocab['<BOS>']] + [SRC_vocab[token] for token in tokenizer(x)] + [SRC_vocab['<EOS>']]
-
+print(SRC_vocab.get_itos())
+exit()
 def get_vocab():
     return SRC_vocab, TRG_vocab, text_transform
 
