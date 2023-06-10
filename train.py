@@ -96,7 +96,7 @@ if __name__ == '__main__':
     running_loss = MeanMetric(accumulate=True).to(device)
     running_reward = MeanMetric(accumulate=True).to(device)
 
-    SRC_vocab, TRG_vocab, text_transform= get_vocab()
+    SRC_vocab, TRG_vocab = get_vocab()
 
     model = Seq2Seq(
         encoder=Encoder(
@@ -137,7 +137,8 @@ if __name__ == '__main__':
         model,
         R=compute_rouge,
         vocabulary=SRC_vocab,
-        J=J
+        J=J,
+        device=device
     )
 
     tokenizer = get_tokenizer('basic_english')

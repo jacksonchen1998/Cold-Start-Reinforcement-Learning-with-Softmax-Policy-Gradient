@@ -35,7 +35,7 @@ def text_transform(text, vocab):
     return [vocab['<BOS>']] + [vocab[token] for token in tokenizer(text)] + [vocab['<EOS>']]
 
 def get_vocab():
-    return SRC_vocab, TRG_vocab, text_transform
+    return SRC_vocab, TRG_vocab
 
 # print("The length of the 'document' vocab is", len(SRC_vocab))
 # print("The length of the 'summary' vocab is", len(TRG_vocab))
