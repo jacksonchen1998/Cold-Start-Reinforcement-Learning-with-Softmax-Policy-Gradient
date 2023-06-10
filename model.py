@@ -203,5 +203,5 @@ class Seq2Seq(nn.Module):
         return outputs
         '''
         # add softmax
-        outputs = F.softmax(output, dim=2)
+        outputs = F.softmax(output, dim=1)
         return outputs

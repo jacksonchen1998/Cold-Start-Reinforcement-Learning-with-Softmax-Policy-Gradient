@@ -15,19 +15,20 @@ def EOS(voc, t, target_sentence, end_token):
     return out
 
 class Updater:
-    def __init__(self, model, R, vocabulary, p_drop=0.5, W=10000, J=1) -> None:
+    def __init__(self, model, R, vocabulary, p_drop=0.5, W=10000, J=1, device='cpu') -> None:
         self.p_drop = p_drop
         self.W = W
         self.J = J
         self.R = R
         self.model = model
         self.voc = vocabulary
+        self.device = device
 
     def update(self, x, y):
         L_BBSPG = 0
         rewards = []
         for j in range(1, self.J+1):
-            z = torch.tensor([])
+            z = torch.tensor([], device=self.device)
             for t in range(1, len(x)+1):
                 mu = torch.rand((1, ))
 

@@ -32,10 +32,10 @@ SRC_vocab = vocab(counter_tokens(train_set, 'document'), min_freq = 2, specials=
 TRG_vocab = vocab(counter_tokens(train_set, 'summary'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
 # text_transform = lambda x: [SRC_vocab['<BOS>']] + [SRC_vocab[token] for token in tokenizer(x)] + [SRC_vocab['<EOS>']]
 def text_transform(text, vocab):
-    return [vocab['<bos>']] + [vocab[token] for token in tokenizer(text)] + [vocab['<eos>']]
+    return [vocab['<BOS>']] + [vocab[token] for token in tokenizer(text)] + [vocab['<EOS>']]
 
 def get_vocab():
-    return SRC_vocab, TRG_vocab, text_transform
+    return SRC_vocab, TRG_vocab
 
 # print("The length of the 'document' vocab is", len(SRC_vocab))
 # print("The length of the 'summary' vocab is", len(TRG_vocab))
