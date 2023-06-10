@@ -15,10 +15,16 @@ def compute_rouge(z, y, voc, t):
     # Convert y: token_id to str
     target = np.array(TRG_vocab.get_itos())[y.cpu()] # [str]
 
-    tile_z = torch.tile(z, dims=(1, 1, len(voc)))
     tile_voc = torch.tile(torch.arange(len(voc), device=device), dims=(1, batch_size, 1))
-    print(z.shape, tile_z.shape, tile_voc.shape)
-    pred = torch.cat([tile_z, tile_voc], dim=0)
+
+    if z.shape[0] == 0:
+        pred = tile_voc
+    else:
+        tile_z = torch.tile(z[..., None], dims=(1, 1, len(voc)))
+        # print('222', tile_z.shape, tile_voc.shape)
+        pred = torch.cat([tile_z, tile_voc], dim=0)
+    return 1
+    print(pred.shape)
 
     score = rouge_score(pred, target, tokenizer=tokenizer)
     # score = {'rouge1_fmeasure': tensor(0.7500),
@@ -54,7 +60,7 @@ def train(model, train_loader):
 
             reward, loss = updater.update(X, Y)
 
-            running_reward.update(reward)
+            running_reward.update(torch.tensor(reward))
             running_loss.update(loss)
             
             optimizer.step()

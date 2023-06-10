@@ -28,7 +28,7 @@ class Updater:
         L_BBSPG = 0
         rewards = []
         for j in range(1, self.J+1):
-            z = torch.tensor([[]], device=self.device) # (T, B)
+            z = torch.tensor([], device=self.device) # (T, B)
             for t in range(1, len(x)+1):
                 mu = torch.rand((1, ))
 
@@ -37,7 +37,7 @@ class Updater:
                 # model_output: (B, C), C = voc.size
                 if mu > self.p_drop:
                     # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1) + DUP(z, self.voc) + EOS(self.voc, t, y))
-                    delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1) + DUP(z, self.voc))
+                    delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1))
 
                     prob = softmax(torch.log(model_output) + delta_r, dim=1)
                     zt_idx = Categorical(probs=prob).sample() # (B,)
