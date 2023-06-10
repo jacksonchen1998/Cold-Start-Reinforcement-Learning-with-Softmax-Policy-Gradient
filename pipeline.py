@@ -48,7 +48,6 @@ class Updater:
                     prob = model_output
                     zt_idx = Categorical(probs=prob).sample() # (B,)
 
-                print(z.shape, zt_idx.shape)
                 z = torch.cat([z, zt_idx[None]], dim=0) # (T, B) token id
 
             rewards.append(self.R(z, y, self.voc, len(z)))

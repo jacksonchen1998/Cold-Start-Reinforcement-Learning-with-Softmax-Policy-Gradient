@@ -13,18 +13,31 @@ from torch.utils.tensorboard import SummaryWriter
 def compute_rouge(z, y, voc, t):
     # z, y: token_ids (T, B)
     # Convert y: token_id to str
-    target = np.array(TRG_vocab.get_itos())[y.cpu()] # [str]
+    targets = np.array(TRG_vocab.get_itos())[y.cpu()] # [str]
+    head = targets[0]
+    space = np.array([' ']*batch_size)
+    for t in targets[1:]:
+        head = np.core.defchararray.add(head, space)
+        head = np.core.defchararray.add(head, t)
+    targets = head.tolist()
 
     tile_voc = torch.tile(torch.arange(len(voc), device=device), dims=(1, batch_size, 1))
 
-    if z.shape[0] == 0:
-        pred = tile_voc
-    else:
-        tile_z = torch.tile(z[..., None], dims=(1, 1, len(voc)))
-        # print('222', tile_z.shape, tile_voc.shape)
-        pred = torch.cat([tile_z, tile_voc], dim=0)
-    return 1
-    print(pred.shape)
+    if len(head) == 5:
+        head = np.array(voc.get_itos())[z.cpu()]
+        print(head)
+        print(head.shape)
+    return 2
+    # if z.shape[0] == 0:
+    #     pred = tile_voc
+    # else:
+    #     tile_z = torch.tile(z[..., None], dims=(1, 1, len(voc)))
+    #     # print('222', tile_z.shape, tile_voc.shape)
+    #     pred = torch.cat([tile_z, tile_voc], dim=0)
+    
+    # print(pred.shape)
+    # for tokens in pred.T:
+
 
     score = rouge_score(pred, target, tokenizer=tokenizer)
     # score = {'rouge1_fmeasure': tensor(0.7500),
