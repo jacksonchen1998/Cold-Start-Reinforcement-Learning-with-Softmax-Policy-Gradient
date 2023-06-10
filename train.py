@@ -13,11 +13,14 @@ from torch.utils.tensorboard import SummaryWriter
 def compute_rouge(z, y, voc, t):
     # z, y: token_ids (T, B)
     # Convert y: token_id to str
-    target = np.array(TRG_vocab.get_itos())[y] # [str]
+    target = np.array(TRG_vocab.get_itos())[y.cpu()] # [str]
 
-    pred = torch.cat([z[None, :], voc])
+    tile_z = torch.tile(z, dims=(1, 1, len(voc)))
+    tile_voc = torch.tile(torch.arange(len(voc), device=device), dims=(1, batch_size, 1))
+    print(z.shape, tile_z.shape, tile_voc.shape)
+    pred = torch.cat([tile_z, tile_voc], dim=0)
 
-    score = rouge_score(z, target, tokenizer=tokenizer)
+    score = rouge_score(pred, target, tokenizer=tokenizer)
     # score = {'rouge1_fmeasure': tensor(0.7500),
     #  'rouge1_precision': tensor(0.7500),
     #  'rouge1_recall': tensor(0.7500),
@@ -143,6 +146,6 @@ if __name__ == '__main__':
 
     tokenizer = get_tokenizer('basic_english')
 
-    train_loader = get_train_dataloader()
+    train_loader = get_train_dataloader(batch_size)
 
     train(model, train_loader)

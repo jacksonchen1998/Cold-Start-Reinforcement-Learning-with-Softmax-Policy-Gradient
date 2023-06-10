@@ -28,7 +28,7 @@ class Updater:
         L_BBSPG = 0
         rewards = []
         for j in range(1, self.J+1):
-            z = torch.tensor([], device=self.device)
+            z = torch.tensor([[]], device=self.device) # (T, B)
             for t in range(1, len(x)+1):
                 mu = torch.rand((1, ))
 
@@ -48,6 +48,7 @@ class Updater:
                     prob = model_output
                     zt_idx = Categorical(probs=prob).sample() # (B,)
 
+                print(z.shape, zt_idx.shape)
                 z = torch.cat([z, zt_idx[None]], dim=0) # (T, B) token id
 
             rewards.append(self.R(z, y, self.voc, len(z)))

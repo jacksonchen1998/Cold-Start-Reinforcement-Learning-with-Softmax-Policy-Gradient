@@ -60,12 +60,12 @@ def collate_batch(batch):
       src_text = torch.tensor(text_transform(_document, SRC_vocab))
       target_list.append(target_text)
       src_list.append(src_text)
-   return pad_sequence(target_list, padding_value=3), pad_sequence(src_list, padding_value=3)
+   return pad_sequence(src_list, padding_value=3), pad_sequence(target_list, padding_value=3)
 
-def get_train_dataloader():
+def get_train_dataloader(batch_size):
     train_dataloader = DataLoader(
         train_set, 
-        batch_size=8, 
+        batch_size=batch_size, 
         shuffle=True, 
         collate_fn=collate_batch)
     return train_dataloader
