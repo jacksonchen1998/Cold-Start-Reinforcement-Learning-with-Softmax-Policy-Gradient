@@ -72,7 +72,7 @@ def get_train_dataloader(batch_size):
 
 batch_size = 8  # A batch size of 8
 
-def batch_sampler():
+def batch_sampler(train_list):
     indices = [(i, len(tokenizer(s['document']))) for i, s in enumerate(train_list)]
     random.shuffle(indices)
     pooled_indices = []
