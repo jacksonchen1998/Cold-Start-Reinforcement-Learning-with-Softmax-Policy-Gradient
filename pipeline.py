@@ -29,6 +29,7 @@ class Updater:
         rewards = []
         for j in range(1, self.J+1):
             z = torch.tensor([], device=self.device) # (T, B)
+            last_R = 0
             for t in range(1, len(x)+1):
                 mu = torch.rand((1, ))
 
@@ -36,21 +37,25 @@ class Updater:
                 model_output = self.model(x, y) # what should be input to model? x?
                 # model_output: (B, C), C = voc.size
                 if mu > self.p_drop:
-                    # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1) + DUP(z, self.voc) + EOS(self.voc, t, y))
-                    delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1))
+                    current_R = self.R(model_output, z, y, self.voc, t)
 
-                    prob = softmax(torch.log(model_output) + delta_r, dim=1)
+                    # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1) + DUP(z, self.voc) + EOS(self.voc, t, y))
+                    # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1))
+                    delta_r = self.W * (current_R - last_R)
+
+                    prob = softmax(torch.log(model_output).cpu() + delta_r, dim=1)
                     zt_idx = Categorical(probs=prob).sample() # (B,)
 
                     L_BBSPG -= torch.log(model_output[torch.arange(len(zt_idx)), zt_idx]) / self.J # (B,)
                     
+                    last_R = torch.mean(current_R)
                 else:
                     prob = model_output
                     zt_idx = Categorical(probs=prob).sample() # (B,)
 
-                z = torch.cat([z, zt_idx[None]], dim=0) # (T, B) token id
+                z = torch.cat([z, zt_idx.cuda()[None]], dim=0) # (T, B) token id
 
-            rewards.append(self.R(z, y, self.voc, len(z)))
+            rewards.append(current_R.mean()) # mean?
 
         L_BBSPG = L_BBSPG.mean()
         loss = L_BBSPG.item()

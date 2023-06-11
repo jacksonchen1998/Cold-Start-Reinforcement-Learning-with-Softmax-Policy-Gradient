@@ -9,51 +9,47 @@ import numpy as np
 from datasets import load_dataset
 from torchtext.data.utils import get_tokenizer
 from torch.utils.tensorboard import SummaryWriter
+from multiprocessing import Pool
+from functools import partial
 
-def compute_rouge(z, y, voc, t):
+def cr(v, head, targets):
+        space = np.array([' ']*head.shape[-1])
+        head = np.core.defchararray.add(head, space)
+        head = np.core.defchararray.add(head, v)
+        # head = np.core.defchararray.add(head, np.array([v]*head.shape[-1]))
+        # mean over batch
+        score_key = 'rouge1_fmeasure'
+        score_dict = rouge_score(head, targets, tokenizer=tokenizer)
+        return score_dict[score_key]
+
+def compute_rouge(model_output, z, y, voc, t):
     # z, y: token_ids (T, B)
     # Convert y: token_id to str
+    ind = torch.topk(model_output, k=50, dim=1).indices.cpu()
+    top50 = np.array(voc.get_itos())[ind].T
+
     targets = np.array(TRG_vocab.get_itos())[y.cpu()] # [str]
     head = targets[0]
     space = np.array([' ']*head.shape[-1])
-    for t in targets[1:]:
+    for tg in targets[1:]:
         head = np.core.defchararray.add(head, space)
-        head = np.core.defchararray.add(head, t)
-    targets = head.tolist()
+        head = np.core.defchararray.add(head, tg)
+    targets = head
 
-    tile_voc = torch.tile(torch.arange(len(voc), device=device), dims=(1, batch_size, 1))
+    heads = np.array(voc.get_itos())[z.int().cpu()]
+    if len(heads) > 0:
+        head = heads[0]
+        space = np.array([' ']*head.shape[-1])
+        for h in heads[1:t]:
+            head = np.core.defchararray.add(head, space)
+            head = np.core.defchararray.add(head, h)
+    else:
+        head = np.array(['']*batch_size)
 
-    # print(z.cpu())
-    # head = np.array(voc.get_itos())[z.cpu()]
-    # tqdm.write(head)
-    # tqdm.write(head.shape)
-        # exit()
-    return 2
-    # if z.shape[0] == 0:
-    #     pred = tile_voc
-    # else:
-    #     tile_z = torch.tile(z[..., None], dims=(1, 1, len(voc)))
-    #     # print('222', tile_z.shape, tile_voc.shape)
-    #     pred = torch.cat([tile_z, tile_voc], dim=0)
+    scores = torch.zeros(len(voc))
+    scores[ind] = torch.stack(pool.map(partial(cr, head=head, targets=targets), top50))
     
-    # print(pred.shape)
-    # for tokens in pred.T:
-
-
-    score = rouge_score(pred, target, tokenizer=tokenizer)
-    # score = {'rouge1_fmeasure': tensor(0.7500),
-    #  'rouge1_precision': tensor(0.7500),
-    #  'rouge1_recall': tensor(0.7500),
-    #  'rouge2_fmeasure': tensor(0.),
-    #  'rouge2_precision': tensor(0.),
-    #  'rouge2_recall': tensor(0.),
-    #  'rougeL_fmeasure': tensor(0.5000),
-    #  'rougeL_precision': tensor(0.5000),
-    #  'rougeL_recall': tensor(0.5000),
-    #  'rougeLsum_fmeasure': tensor(0.5000),
-    #  'rougeLsum_precision': tensor(0.5000),
-    #  'rougeLsum_recall': tensor(0.5000)}
-    return score['rouge1_fmeasure']
+    return scores
 
 def train(model, train_loader):
     '''
@@ -144,7 +140,7 @@ if __name__ == '__main__':
     writer = SummaryWriter()
 
     batch_size = 8
-    num_workers = 4
+    num_workers = 24
     epochs = 50
     lr = 8e-4
     optimizer = torch.optim.Adam(model.parameters(), lr)
@@ -158,7 +154,7 @@ if __name__ == '__main__':
     updater = Updater(
         model,
         R=compute_rouge,
-        vocabulary=SRC_vocab,
+        vocabulary=TRG_vocab,
         J=J,
         device=device
     )
@@ -166,5 +162,7 @@ if __name__ == '__main__':
     tokenizer = get_tokenizer('basic_english')
 
     train_loader = get_train_dataloader(batch_size)
+
+    pool = Pool(num_workers)
 
     train(model, train_loader)
