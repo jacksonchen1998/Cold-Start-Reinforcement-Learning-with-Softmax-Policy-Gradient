@@ -22,7 +22,8 @@ class Updater:
         for b, sen in enumerate(target_sentence.T):
             if t < torch.where(sen == self.voc['<EOS>'])[0].item():
                 out[b, self.voc['<EOS>']] = -1
-        return out#
+        return out
+    
     def update(self, x, y):
         L_BBSPG = 0
         rewards = []
