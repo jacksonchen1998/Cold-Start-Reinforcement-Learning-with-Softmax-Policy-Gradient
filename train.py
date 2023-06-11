@@ -26,6 +26,7 @@ def compute_rouge(model_output, z, y, voc, t):
     # Convert y: token_id to str
     ind = torch.topk(model_output, k=50, dim=1).indices.cpu()
     top50 = np.array(voc.get_itos())[ind].T
+    B = model_output.shape[0]
 
     targets = np.array(TRG_vocab.get_itos())[y.cpu()] # [str]
     head = targets[0]
@@ -43,10 +44,11 @@ def compute_rouge(model_output, z, y, voc, t):
             head = np.core.defchararray.add(head, space)
             head = np.core.defchararray.add(head, h)
     else:
-        head = np.array(['']*batch_size)
+        head = np.array(['']*B)
 
     scores = torch.zeros(y.shape[1], len(voc))
-    scores[:, ind] = torch.stack(pool.map(partial(cr, head=head, targets=targets), top50), dim=1)
+    pm = pool.map(partial(cr, head=head, targets=targets), top50)
+    scores[:, ind] = torch.stack(pm, dim=1)
     
     return scores
 
@@ -60,7 +62,8 @@ def train(model, train_loader):
         running_reward.reset()
         running_loss.reset()
 
-        for X, Y in (bar:=tqdm(train_loader, desc=f'[Train {epoch:3d}] lr={scheduler.get_last_lr()[0]:2.2e}', position=0)):
+        for i, (X, Y) in enumerate(bar:=tqdm(train_loader, desc=f'[Train {epoch:3d}] lr={scheduler.get_last_lr()[0]:2.2e}', position=0)):
+            # if i < 240: continue
             optimizer.zero_grad()
 
             X = X.to(device)
@@ -86,11 +89,11 @@ def train(model, train_loader):
                 epoch, 
                 model, 
                 optimizer, 
-                scheduler.state_dict(), 
+                scheduler, 
                 'checkpoint.pth'
             )
 
-def save_checkpoint(epoch, model, optimizer, path):
+def save_checkpoint(epoch, model, optimizer, scheduler, path):
     torch.save({
         'epoch': epoch,
         'model_state_dict': model.state_dict(),
