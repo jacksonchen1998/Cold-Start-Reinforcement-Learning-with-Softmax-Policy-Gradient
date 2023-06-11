@@ -55,7 +55,7 @@ class Updater:
 
                 z = torch.cat([z, zt_idx.cuda()[None]], dim=0) # (T, B) token id
 
-            rewards.append(current_R)
+            rewards.append(current_R.mean()) # mean?
 
         L_BBSPG = L_BBSPG.mean()
         loss = L_BBSPG.item()
