@@ -9,7 +9,7 @@ from torch.nn.utils.rnn import pad_sequence
 
 dataset = load_dataset("gigaword")
 train_set = dataset['train']
-train_set = train_set[:100]
+train_set = dataset['test']
 val_set = dataset['validation']
 test_set = dataset['test']
 
@@ -31,6 +31,9 @@ def counter_tokens(dataset, col_name):
 # vocab = build_vocab_from_iterator(yield_tokens(dataset), specials=["<unk>"])
 SRC_vocab = vocab(counter_tokens(train_set, 'document'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
 TRG_vocab = vocab(counter_tokens(train_set, 'summary'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
+SRC_vocab.set_default_index(SRC_vocab['<unk>'])
+TRG_vocab.set_default_index(TRG_vocab['<unk>'])
+
 # text_transform = lambda x: [SRC_vocab['<BOS>']] + [SRC_vocab[token] for token in tokenizer(x)] + [SRC_vocab['<EOS>']]
 def text_transform(text, vocab):
     return [vocab['<BOS>']] + [vocab[token] for token in tokenizer(text)] + [vocab['<EOS>']]

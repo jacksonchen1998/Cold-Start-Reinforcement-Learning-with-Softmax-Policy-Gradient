@@ -15,7 +15,7 @@ def compute_rouge(z, y, voc, t):
     # Convert y: token_id to str
     targets = np.array(TRG_vocab.get_itos())[y.cpu()] # [str]
     head = targets[0]
-    space = np.array([' ']*batch_size)
+    space = np.array([' ']*head.shape[-1])
     for t in targets[1:]:
         head = np.core.defchararray.add(head, space)
         head = np.core.defchararray.add(head, t)
@@ -23,10 +23,10 @@ def compute_rouge(z, y, voc, t):
 
     tile_voc = torch.tile(torch.arange(len(voc), device=device), dims=(1, batch_size, 1))
 
-    tqdm.write(z.cpu())
-    head = np.array(voc.get_itos())[z.cpu()]
-    tqdm.write(head)
-    tqdm.write(head.shape)
+    # print(z.cpu())
+    # head = np.array(voc.get_itos())[z.cpu()]
+    # tqdm.write(head)
+    # tqdm.write(head.shape)
         # exit()
     return 2
     # if z.shape[0] == 0:
