@@ -34,13 +34,10 @@ class Updater:
                 mu = torch.rand((1, ))
 
                 # x: (T, B, D) 
-                model_output = self.model(x, y) # what should be input to model? x?
+                model_output = self.model(x, y)
                 # model_output: (B, C), C = voc.size
                 if mu > self.p_drop:
                     current_R = self.R(model_output, z, y, self.voc, t)
-
-                    # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1) + DUP(z, self.voc) + EOS(self.voc, t, y))
-                    # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1))
                     delta_r = self.W * (current_R - last_R + self.DUP(z) + self.EOS(t, y))
 
                     prob = softmax(torch.log(model_output).cpu() + delta_r, dim=1)
@@ -48,7 +45,7 @@ class Updater:
 
                     L_BBSPG -= torch.log(model_output[torch.arange(len(zt_idx)), zt_idx]) / self.J # (B,)
                     
-                    last_R = torch.mean(current_R)
+                    last_R = current_R
                 else:
                     prob = model_output
                     zt_idx = Categorical(probs=prob).sample() # (B,)

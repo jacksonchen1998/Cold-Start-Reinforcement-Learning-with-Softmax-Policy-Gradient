@@ -13,14 +13,13 @@ from multiprocessing import Pool
 from functools import partial
 
 def cr(v, head, targets):
-        space = np.array([' ']*head.shape[-1])
-        head = np.core.defchararray.add(head, space)
-        head = np.core.defchararray.add(head, v)
-        # head = np.core.defchararray.add(head, np.array([v]*head.shape[-1]))
-        # mean over batch
-        score_key = 'rouge1_fmeasure'
-        score_dict = rouge_score(head, targets, tokenizer=tokenizer)
-        return score_dict[score_key]
+    space = np.array([' ']*head.shape[-1])
+    head = np.core.defchararray.add(head, space)
+    head = np.core.defchararray.add(head, v)
+    score_key = 'rouge1_fmeasure'
+    score_list = [rouge_score(h, t, tokenizer=tokenizer)[score_key] for h, t in zip(head, targets)]
+    return torch.stack(score_list)
+     
 
 def compute_rouge(model_output, z, y, voc, t):
     # z, y: token_ids (T, B)
@@ -46,8 +45,8 @@ def compute_rouge(model_output, z, y, voc, t):
     else:
         head = np.array(['']*batch_size)
 
-    scores = torch.zeros(len(voc))
-    scores[ind] = torch.stack(pool.map(partial(cr, head=head, targets=targets), top50))
+    scores = torch.zeros(y.shape[1], len(voc))
+    scores[:, ind] = torch.stack(pool.map(partial(cr, head=head, targets=targets), top50), dim=1)
     
     return scores
 
