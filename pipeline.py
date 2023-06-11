@@ -2,18 +2,6 @@ import torch
 from torch.nn.functional import softmax
 from torch.distributions import Categorical
 
-def DUP(z, voc):
-    out = (torch.arange(len(voc)) == z[-1][:, None]) * -1 # (B, voc_size)
-    return out
-
-def EOS(voc, t, target_sentence, end_token):
-    out = torch.zeros(len(voc))
-    if t < len(target_sentence):
-        #  end_token = # TODO: get end_token form voc
-        torch.arange(len(voc))
-        out[voc == end_token] = -1
-    return out
-
 class Updater:
     def __init__(self, model, R, vocabulary, p_drop=0.5, W=10000, J=1, device='cpu') -> None:
         self.p_drop = p_drop
@@ -23,6 +11,19 @@ class Updater:
         self.model = model
         self.voc = vocabulary
         self.device = device
+
+    def DUP(self, z):
+        if len(z) == 0: return 0
+        out = (torch.arange(len(self.voc), device=self.device) == z[-1][:, None]) * -1 # (B, voc_size)
+        return out.cpu()
+    
+    def EOS(self, t, target_sentence):
+        out = torch.zeros(target_sentence.shape[1], len(self.voc))
+        for b, sen in enumerate(target_sentence.T):
+            print(torch.where(sen == self.voc['<EOS>'])[0].item())
+            if t < torch.where(sen == self.voc['<EOS>'])[0].item():
+                out[b, self.voc['<EOS>']] = -1
+        return out
 
     def update(self, x, y):
         L_BBSPG = 0
@@ -41,7 +42,7 @@ class Updater:
 
                     # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1) + DUP(z, self.voc) + EOS(self.voc, t, y))
                     # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1))
-                    delta_r = self.W * (current_R - last_R)
+                    delta_r = self.W * (current_R - last_R + self.DUP(z) + self.EOS(t, y))
 
                     prob = softmax(torch.log(model_output).cpu() + delta_r, dim=1)
                     zt_idx = Categorical(probs=prob).sample() # (B,)
