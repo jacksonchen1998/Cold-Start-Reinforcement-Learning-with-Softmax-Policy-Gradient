@@ -9,6 +9,7 @@ from torch.nn.utils.rnn import pad_sequence
 
 dataset = load_dataset("gigaword")
 train_set = dataset['train']
+train_set = train_set[:100]
 val_set = dataset['validation']
 test_set = dataset['test']
 
