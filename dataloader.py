@@ -13,8 +13,6 @@ train_set = dataset['test']
 val_set = dataset['validation']
 test_set = dataset['test']
 
-train_set = test_set
-
 # print(len(train_set), len(val_set), len(test_set))
 
 # tokenizer = BertTokenizer.from_pretrained('bert-base-cased')

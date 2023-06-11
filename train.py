@@ -55,7 +55,6 @@ def train(model, train_loader):
     '''
     Training pipeline.
     '''
-    epochs = 50
     for epoch in (overall:=trange(1, epochs+1, position=1, desc='[Overall]')):
         model.train()
         
