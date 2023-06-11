@@ -23,10 +23,11 @@ def compute_rouge(z, y, voc, t):
 
     tile_voc = torch.tile(torch.arange(len(voc), device=device), dims=(1, batch_size, 1))
 
-    if len(head) == 5:
-        head = np.array(voc.get_itos())[z.cpu()]
-        print(head)
-        print(head.shape)
+    tqdm.write(z.cpu())
+    head = np.array(voc.get_itos())[z.cpu()]
+    tqdm.write(head)
+    tqdm.write(head.shape)
+        # exit()
     return 2
     # if z.shape[0] == 0:
     #     pred = tile_voc
@@ -116,7 +117,7 @@ if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
     running_loss = MeanMetric(accumulate=True).to(device)
-    running_reward = MeanMetric(accumulate=True).to(device)
+    running_reward = MeanMetric(accumulate=True)
 
     SRC_vocab, TRG_vocab = get_vocab()
 
@@ -143,7 +144,7 @@ if __name__ == '__main__':
 
     writer = SummaryWriter()
 
-    batch_size = 128
+    batch_size = 8
     num_workers = 4
     epochs = 50
     lr = 8e-4

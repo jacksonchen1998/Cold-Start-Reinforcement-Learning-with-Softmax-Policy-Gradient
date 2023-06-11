@@ -56,5 +56,5 @@ class Updater:
         loss = L_BBSPG.item()
         L_BBSPG.backward()
 
-        return torch.mean(rewards), loss
+        return rewards, loss
         
