@@ -15,15 +15,19 @@ from functools import partial
 def cr(v, head, targets):
         space = np.array([' ']*head.shape[-1])
         head = np.core.defchararray.add(head, space)
-        head = np.core.defchararray.add(head, np.array([v]*head.shape[-1]))
+        head = np.core.defchararray.add(head, v)
+        # head = np.core.defchararray.add(head, np.array([v]*head.shape[-1]))
         # mean over batch
         score_key = 'rouge1_fmeasure'
         score_dict = rouge_score(head, targets, tokenizer=tokenizer)
         return score_dict[score_key]
 
-def compute_rouge(z, y, voc, t):
+def compute_rouge(model_output, z, y, voc, t):
     # z, y: token_ids (T, B)
     # Convert y: token_id to str
+    ind = torch.topk(model_output, k=50, dim=1).indices.cpu()
+    top50 = np.array(voc.get_itos())[ind].T
+
     targets = np.array(TRG_vocab.get_itos())[y.cpu()] # [str]
     head = targets[0]
     space = np.array([' ']*head.shape[-1])
@@ -42,10 +46,10 @@ def compute_rouge(z, y, voc, t):
     else:
         head = np.array(['']*batch_size)
 
-    scores = torch.stack(pool.map(partial(cr, head=head, targets=targets), voc.get_itos()))
-    print(scores.shape)
+    scores = torch.zeros(len(voc))
+    scores[ind] = torch.stack(pool.map(partial(cr, head=head, targets=targets), top50))
     
-    return scores[None]
+    return scores
 
 def train(model, train_loader):
     '''

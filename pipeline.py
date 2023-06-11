@@ -37,7 +37,7 @@ class Updater:
                 model_output = self.model(x, y) # what should be input to model? x?
                 # model_output: (B, C), C = voc.size
                 if mu > self.p_drop:
-                    current_R = self.R(z, y, self.voc, t)
+                    current_R = self.R(model_output, z, y, self.voc, t)
 
                     # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1) + DUP(z, self.voc) + EOS(self.voc, t, y))
                     # delta_r = self.W * (self.R(z, y, self.voc, t) - self.R(z, y, self.voc, t-1))
