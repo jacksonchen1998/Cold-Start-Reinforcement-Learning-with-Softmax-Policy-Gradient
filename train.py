@@ -16,7 +16,7 @@ def cr(v, head, targets):
     space = np.array([' ']*head.shape[-1])
     head = np.core.defchararray.add(head, space)
     head = np.core.defchararray.add(head, v)
-    score_key = 'rouge1_fmeasure'
+    score_key = 'rougeL_fmeasure'
     score_list = [rouge_score(h, t, tokenizer=tokenizer)[score_key] for h, t in zip(head, targets)]
     return torch.stack(score_list)
      
@@ -100,6 +100,7 @@ def save_checkpoint(epoch, model, optimizer, scheduler, path):
         'optimizer_state_dict': optimizer.state_dict(),
         'scheduler_state_dict': scheduler.state_dict()
     }, path)
+    tqdm.write('\r\033[K', end='')
     tqdm.write('Save checkpoint')
 
 def load_ckpt():

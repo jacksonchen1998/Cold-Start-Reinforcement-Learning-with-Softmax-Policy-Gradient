@@ -8,7 +8,7 @@ This repository contains an implementation of the reinforcement learning method 
 
 ## Method
 
-[RNN Encoder Decoder](https://github.com/threelittlemonkeys/rnn-encoder-decoder-pytorch)
+[RNN Encoder Decoder](https://github.com/bentrevett/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb)
 
 ## Requirements
 
@@ -24,21 +24,45 @@ Intsall the required packages using the following command:
 conda install --file requirements.txt
 ```
 
+## Program issues
+
+In `pipeline.py`, change the following line if has an error:
+
+```
+AssertionError: Torch not compiled with CUDA enabled
+```
+
+Change
+
+```py
+z = torch.cat([z, zt_idx.cuda()[None]], dim=0) # (T, B) token id
+```
+
+to
+
+```py
+z = torch.cat([z, zt_idx[None]], dim=0) # (T, B) token id
+```
+
 ## Experiment
 
 ### Summarization Task: Headline Generation
 
-- Dataset:
-      - Training: [English Gigaword](https://catalog.ldc.upenn.edu/LDC2003T05)
-      - Testing: [DUC 2004](https://duc.nist.gov/duc2004/)
-- Evaluation: [ROUGE-L score](https://arxiv.org/abs/1803.01937)
+Dataset:
+- Training: [English Gigaword](https://catalog.ldc.upenn.edu/LDC2003T05)
+- Testing: [DUC 2004](https://duc.nist.gov/duc2004/)
+
+Evaluation: 
+[ROUGE-L score](https://arxiv.org/abs/1803.01937)
 
 ### Automatic Image-Caption Generation
 
-- Dataset:
-      - Training / Validation: [Microsoft COCO](https://cocodataset.org/#home)
-      - Testing: [Microsoft COCO](https://cocodataset.org/#home)
-- Evaluation: [CIDer score](https://arxiv.org/abs/1411.5726) / ROUGE-L score
+Dataset:
+- Training / Validation: [Microsoft COCO](https://cocodataset.org/#home)
+- Testing: [Microsoft COCO](https://cocodataset.org/#home)
+
+Evaluation: 
+[CIDer score](https://arxiv.org/abs/1411.5726) / ROUGE-L score
 
 ## Results
 

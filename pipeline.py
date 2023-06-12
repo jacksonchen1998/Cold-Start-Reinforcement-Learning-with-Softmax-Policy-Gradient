@@ -51,8 +51,8 @@ class Updater:
                     zt_idx = Categorical(probs=prob).sample() # (B,)
 
                 z = torch.cat([z, zt_idx.cuda()[None]], dim=0) # (T, B) token id
-
-            rewards.append(current_R.mean()) # mean?
+            
+            rewards.append(current_R[torch.arange(len(zt_idx)), zt_idx.cpu()].mean()) # mean?
 
         L_BBSPG = L_BBSPG.mean()
         loss = L_BBSPG.item()
