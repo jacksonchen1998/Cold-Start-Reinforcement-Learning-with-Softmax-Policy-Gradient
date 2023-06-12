@@ -26,11 +26,19 @@ conda install --file requirements.txt
 
 ## Program issues
 
-In `pipeline.py`, change the following line if you are using MacOS or Linux:
+In `pipeline.py`, change the following line if has an error:
+
+```
+AssertionError: Torch not compiled with CUDA enabled
+```
+
+Change
 
 ```py
 z = torch.cat([z, zt_idx.cuda()[None]], dim=0) # (T, B) token id
 ```
+
+to
 
 ```py
 z = torch.cat([z, zt_idx[None]], dim=0) # (T, B) token id
