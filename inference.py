@@ -27,6 +27,15 @@ def inference(model, ipt, voc, temperature=2):
     
     return np.array(voc.get_itos())[output.cpu()]
 
+def cat_str_array(array):
+    head = array[0]
+    space = np.array([' ']*head.shape[-1])
+    for tg in array[1:]:
+        head = np.core.defchararray.add(head, space)
+        head = np.core.defchararray.add(head, tg)
+    
+    return head
+
 if __name__ == '__main__':
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
@@ -63,3 +72,4 @@ if __name__ == '__main__':
     example = torch.tensor(text_transform(example, TRG_vocab))[:, None]
     print(example)
     ouput_array = inference(model, example, TRG_vocab)
+    print(cat_str_array(ouput_array))
