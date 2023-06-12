@@ -29,6 +29,7 @@ def counter_tokens(dataset, col_name):
     return counter
 
 # vocab = build_vocab_from_iterator(yield_tokens(dataset), specials=["<unk>"])
+print("Building vocabulary...")
 SRC_vocab = vocab(counter_tokens(train_set, 'document'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
 TRG_vocab = vocab(counter_tokens(train_set, 'summary'), min_freq = 2, specials=('<unk>', '<BOS>', '<EOS>', '<PAD>'))
 SRC_vocab.set_default_index(SRC_vocab['<unk>'])
