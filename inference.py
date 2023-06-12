@@ -7,7 +7,7 @@ from torchtext.data.utils import get_tokenizer
 import numpy as np
 
 @torch.no_grad()
-def inference(model, ipt, voc, temperature=2):
+def inference(model, ipt, voc, temperature=1):
     '''
     Inference pipeline.
     '''
@@ -19,7 +19,7 @@ def inference(model, ipt, voc, temperature=2):
         model_output = model(ipt, output)
         # model_output: (B=1, C), C = voc.size
         top = torch.topk(model_output, k=50, dim=1)
-        prob = softmax(top.values/temperature, dim=1)
+        prob = softmax(torch.log(top.values)/temperature, dim=1)
         zt_idx = Categorical(probs=prob).sample() # (B,)
         word_idx = top.indices[torch.arange(len(top.indices)), zt_idx]
 
@@ -66,10 +66,8 @@ if __name__ == '__main__':
     state_dict = torch.load('checkpoint.pth')['model_state_dict']
     model.load_state_dict(state_dict)
 
-    example = '''
-    japan 's nec corp. and UNK computer corp. of the united states said wednesday they had agreed to join forces in supercomputer sales .
-    '''
+    example = "japan 's nec corp. and UNK computer corp. of the united states said wednesday they had agreed to join forces in supercomputer sales ."
+    example = "the sri lankan government on wednesday announced the closure of government schools with immediate effect as a military campaign against tamil separatists escalated in the north of the country ."
     example = torch.tensor(text_transform(example, TRG_vocab))[:, None]
-    print(example)
     ouput_array = inference(model, example, TRG_vocab)
     print(cat_str_array(ouput_array))
