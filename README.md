@@ -43,6 +43,7 @@ z = torch.cat([z, zt_idx[None]], dim=0) # (T, B) token id
 Dataset:
 - Training: [English Gigaword](https://catalog.ldc.upenn.edu/LDC2003T05)
 - Testing: [DUC 2004](https://duc.nist.gov/duc2004/)
+
 Evaluation: 
 [ROUGE-L score](https://arxiv.org/abs/1803.01937)
 
@@ -51,6 +52,7 @@ Evaluation:
 Dataset:
 - Training / Validation: [Microsoft COCO](https://cocodataset.org/#home)
 - Testing: [Microsoft COCO](https://cocodataset.org/#home)
+
 Evaluation: 
 [CIDer score](https://arxiv.org/abs/1411.5726) / ROUGE-L score
 
