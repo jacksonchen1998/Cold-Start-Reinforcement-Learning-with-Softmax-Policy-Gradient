@@ -1,6 +1,6 @@
 # Cold-Start-Reinforcement-Learning-with-Softmax-Policy-Gradient
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Release](https://img.shields.io/github/v/release/jacksonchen1998/Cold-Start-Reinforcement-Learning-with-Softmax-Policy-Gradient)](https://github.com/jacksonchen1998/Cold-Start-Reinforcement-Learning-with-Softmax-Policy-Gradient/releases/)
 
 [Paper](https://arxiv.org/abs/1709.09346)
 
@@ -9,6 +9,8 @@ This repository contains an implementation of the reinforcement learning method 
 ## Method
 
 [RNN Encoder Decoder](https://github.com/bentrevett/pytorch-seq2seq/blob/master/3%20-%20Neural%20Machine%20Translation%20by%20Jointly%20Learning%20to%20Align%20and%20Translate.ipynb)
+
+![model](./image/alg.png)
 
 ## Requirements
 
@@ -65,6 +67,14 @@ Evaluation:
 [CIDer score](https://arxiv.org/abs/1411.5726) / ROUGE-L score
 
 ## Results
+
+### Model loss
+
+![loss](./image/loss.png)
+
+### Model reward (ROUGE-L score)
+
+![reward](./image/reward.png)
 
 ## Acknowledgements
 
