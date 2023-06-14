@@ -74,7 +74,7 @@ We would like to thank Nan Ding and Radu Soricut for their valuable contribution
 
 ```
 @misc{20230615,
-  author = {Chih-Chun Chen, Pin-Yen Liu, Po-Chuan Chen},
+  author = {Chih-Chun Chen and Pin-Yen Liu and Po-Chuan Chen},
   title = {Cold-Start Reinforcement Learning with Softmax Policy Gradient},
   year = {2023},
   month = {06},
