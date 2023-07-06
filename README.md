@@ -80,6 +80,12 @@ Evaluation:
 
 We would like to thank Nan Ding and Radu Soricut for their valuable contributions to the field of reinforcement learning, and for making their paper available to the public. We also acknowledge the TensorFlow team for providing a powerful and flexible deep learning framework.
 
+## Contributors
+
+<a href="https://github.com/jacksonchen1998/Cold-Start-Reinforcement-Learning-with-Softmax-Policy-Gradient/graphs/contributors">
+  <img src="http://contributors.nn.ci/api?repo=jacksonchen1998/Cold-Start-Reinforcement-Learning-with-Softmax-Policy-Gradient" />
+</a>
+
 ## Citation
 
 ```
